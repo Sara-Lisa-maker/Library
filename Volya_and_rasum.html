@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Воля и разум</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:#0a0a0c;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    color:#e8e8ec;
+    min-height:100vh;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    font-feature-settings:'ss01';
+  }
+
+  .ambient{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    overflow:hidden;
+  }
+  .ambient::before{
+    content:'';
+    position:absolute;
+    top:-20%;
+    left:-10%;
+    width:70vw;
+    height:70vw;
+    background:radial-gradient(circle,rgba(60,120,160,0.18) 0%,transparent 60%);
+    filter:blur(50px);
+  }
+  .ambient::after{
+    content:'';
+    position:absolute;
+    bottom:-40%;
+    right:-15%;
+    width:80vw;
+    height:80vw;
+    background:radial-gradient(circle,rgba(40,70,120,0.15) 0%,transparent 60%);
+    filter:blur(50px);
+  }
+
+  header{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:rgba(10,10,12,0.72);
+    backdrop-filter:blur(22px) saturate(140%);
+    border-bottom:1px solid rgba(255,255,255,0.05);
+  }
+  .header-inner{
+    max-width:1360px;
+    margin:0 auto;
+    padding:1.3rem 2.5rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:2rem;
+  }
+
+  .back-link{
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+    color:#b0b0c0;
+    font-size:0.85rem;
+    font-weight:500;
+    text-decoration:none;
+    transition:0.2s;
+    letter-spacing:0.01em;
+  }
+  .back-link:hover{color:#ffffff}
+  .back-link svg{
+    width:16px;
+    height:16px;
+    stroke:currentColor;
+    fill:none;
+    stroke-width:2;
+    transition:transform 0.2s;
+  }
+  .back-link:hover svg{transform:translateX(-3px)}
+
+  .nv-age{
+    font-size:0.7rem;
+    font-weight:700;
+    letter-spacing:0.1em;
+    color:#a8c9e8;
+    padding:0.35rem 0.7rem;
+    background:rgba(100,150,200,0.12);
+    border-radius:5px;
+  }
+
+  .novel-hero{
+    position:relative;
+    z-index:1;
+    max-width:1360px;
+    margin:0 auto;
+    padding:4rem 2.5rem 3rem;
+    display:grid;
+    grid-template-columns:320px 1fr;
+    gap:4.5rem;
+    align-items:center;
+  }
+
+  .novel-cover{
+    aspect-ratio:2/3;
+    border-radius:8px;
+    overflow:hidden;
+    position:relative;
+    box-shadow:0 50px 90px -30px rgba(0,0,0,0.95),0 4px 20px rgba(0,0,0,0.5);
+  }
+  .novel-cover .cover-art{
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(circle at 28% 22%, #4a7a9c66 0%, transparent 55%),
+      radial-gradient(circle at 78% 88%, #2d4a5e77 0%, transparent 60%),
+      linear-gradient(160deg, #1a2a3a 0%, #2d4a5e 100%);
+  }
+  .novel-cover .cover-noise{
+    position:absolute;
+    inset:0;
+    opacity:0.35;
+    mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+    z-index:1;
+  }
+  .novel-cover .cover-art::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,0.9) 100%);
+    z-index:2;
+  }
+  .novel-cover .cover-content{
+    position:absolute;
+    inset:0;
+    padding:2.2rem 1.8rem;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    z-index:3;
+  }
+  .novel-cover .cover-title{
+    font-family:'Georgia',serif;
+    font-size:1.85rem;
+    line-height:1.1;
+    color:#ffffff;
+    text-shadow:0 2px 22px rgba(0,0,0,0.75);
+    letter-spacing:-0.01em;
+  }
+
+  .novel-info h1{
+    font-family:'Georgia',serif;
+    font-size:clamp(2.4rem,5vw,3.8rem);
+    font-weight:400;
+    line-height:1.05;
+    letter-spacing:-0.02em;
+    color:#f5f5f8;
+    margin-bottom:1.4rem;
+  }
+
+  .novel-genres{
+    display:flex;
+    gap:0.5rem;
+    flex-wrap:wrap;
+    margin-bottom:1.8rem;
+  }
+  .genre-pill{
+    font-size:0.74rem;
+    font-weight:500;
+    color:#b0c0d0;
+    padding:0.4rem 0.9rem;
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:100px;
+    letter-spacing:0.03em;
+  }
+
+  .novel-desc{
+    font-size:0.98rem;
+    line-height:1.7;
+    color:#9a9aac;
+    max-width:560px;
+    font-weight:380;
+  }
+
+  .chapters-section{
+    position:relative;
+    z-index:1;
+    max-width:1360px;
+    margin:0 auto;
+    padding:2rem 2.5rem 6rem;
+    border-top:1px solid rgba(255,255,255,0.06);
+  }
+
+  .chapters-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:1rem;
+    margin-bottom:2rem;
+    flex-wrap:wrap;
+  }
+  .chapters-head h2{
+    font-family:'Georgia',serif;
+    font-size:1.8rem;
+    font-weight:400;
+    letter-spacing:-0.01em;
+    color:#f5f5f8;
+  }
+
+  .chapters-soon{
+    padding:3.5rem 2rem;
+    text-align:center;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:16px;
+  }
+  .chapters-soon .soon-title{
+    font-family:'Georgia',serif;
+    font-style:italic;
+    font-size:1.4rem;
+    color:#d0d0dc;
+    line-height:1.5;
+    display:block;
+    margin-bottom:1.4rem;
+  }
+  .chapters-soon .accent{
+    display:inline-block;
+    font-family:'Inter',sans-serif;
+    font-style:normal;
+    font-size:0.7rem;
+    font-weight:600;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:#a8c9e8;
+    padding:0.55rem 1.1rem;
+    background:rgba(100,150,200,0.12);
+    border-radius:6px;
+  }
+
+  ::-webkit-scrollbar{width:8px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:10px}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.18)}
+
+  @media (max-width:900px){
+    .header-inner{padding:1.1rem 1.5rem}
+    .novel-hero{
+      grid-template-columns:1fr;
+      gap:2.5rem;
+      padding:2.5rem 1.5rem 2rem;
+      max-width:460px;
+    }
+    .novel-cover{max-width:280px;margin:0 auto;width:100%}
+    .novel-info h1{font-size:2.2rem;text-align:center}
+    .novel-genres{justify-content:center}
+    .novel-desc{text-align:center;margin:0 auto}
+    .chapters-section{padding:1.5rem 1.5rem 4rem}
+    .chapters-head h2{font-size:1.5rem}
+  }
+
+  @media (max-width:480px){
+    .novel-info h1{font-size:1.9rem}
+    .chapters-soon{padding:2.5rem 1.2rem}
+    .chapters-soon .soon-title{font-size:1.15rem}
+  }
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="back-link">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Библиотека
+    </a>
+    <span class="nv-age">18+</span>
+  </div>
+</header>
+
+<section class="novel-hero">
+  <div class="novel-cover">
+    <div class="cover-art">
+      <div class="cover-noise"></div>
+      <div class="cover-content">
+        <div class="cover-title">Воля и разум</div>
+      </div>
+    </div>
+  </div>
+  <div class="novel-info">
+    <h1>Воля и разум</h1>
+    <div class="novel-genres">
+      <span class="genre-pill">романтика</span>
+      <span class="genre-pill">триллер</span>
+    </div>
+    <p class="novel-desc">Он считал, что разум — это клетка, а воля — ключ. Она была единственным исключением из его идеальной логики. Теперь между ними — игра, где на кону стоит нечто большее, чем просто свобода. Ставка — её собственная жизнь.</p>
+  </div>
+</section>
+
+<section class="chapters-section">
+  <div class="chapters-head">
+    <h2>Главы</h2>
+  </div>
+  <div class="chapters-soon">
+    <span class="soon-title">Главы скоро появятся</span>
+    <span class="accent">В работе</span>
+  </div>
+</section>
+
+</body>
+</html>
