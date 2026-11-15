@@ -338,40 +338,39 @@
     font-size:1.16rem;
     line-height:1.85;
     color:#e4d8c8;
-    white-space:pre-wrap;
     letter-spacing:0.005em;
     animation:pageIn 0.45s cubic-bezier(0.2,0.8,0.2,1);
   }
-  .page-sheet p{margin:0}
+  .page-sheet p{margin:0;white-space:pre-wrap}
   .page-sheet p + p{margin-top:0.9em}
   .page-sheet .epigraph{
     font-style:italic;
     color:#d4a5a5;
   }
-  .page-sheet .letter{
-    font-style:italic;
-    color:#e8dccc;
-    padding-left:1.4rem;
-    border-left:2px solid rgba(200,140,140,0.25);
-    margin-top:1.2em;
-    margin-bottom:1.2em;
-  }
-  .page-sheet .letter + .letter{
-    margin-top:0.6em;
-  }
-  .page-sheet .letter.first{
-    margin-top:1.2em;
-    padding-top:0.2em;
-  }
-  .page-sheet .letter.last{
-    margin-bottom:1.4em;
-  }
+
+  /* адрес на конверте — курсив, по центру */
   .page-sheet .address{
-    font-style:italic;
+    font-style:italic !important;
     color:#d0c0b0;
     text-align:center;
     margin:0.9em 0;
   }
+
+  /* текст письма — курсив, с мягкой линией слева */
+  .page-sheet .letter{
+    font-style:italic !important;
+    color:#e8dccc;
+    padding-left:1.4rem;
+    border-left:2px solid rgba(200,140,140,0.3);
+  }
+  .page-sheet .letter.first{
+    margin-top:1em;
+    padding-top:0.2em;
+  }
+  .page-sheet .letter.last{
+    margin-bottom:1.2em;
+  }
+
   .page-sheet .separator{
     text-align:center;
     font-family:'Georgia',serif;
@@ -906,25 +905,29 @@
         pageSheet.appendChild(sep);
         return;
       }
-      let tag = '';
-      let text = raw;
+      let isLetter = false, isAddress = false, text = raw, extra = '';
       if (raw.startsWith('[ADDR]')) {
-        tag = 'address';
-        text = raw.slice(6);
+        isAddress = true;
+        text = raw.slice(6); // [ADDR] = 6 символов
       } else if (raw.startsWith('[LETTER-FIRST]')) {
-        tag = 'letter first';
-        text = raw.slice(13);
+        isLetter = true; extra = 'first';
+        text = raw.slice(14); // [LETTER-FIRST] = 14 символов
       } else if (raw.startsWith('[LETTER-LAST]')) {
-        tag = 'letter last';
-        text = raw.slice(12);
+        isLetter = true; extra = 'last';
+        text = raw.slice(13); // [LETTER-LAST] = 13 символов
       } else if (raw.startsWith('[LETTER]')) {
-        tag = 'letter';
-        text = raw.slice(8);
+        isLetter = true;
+        text = raw.slice(8); // [LETTER] = 8 символов
       }
       const el = document.createElement('p');
       el.textContent = text;
-      if (tag) el.className = tag;
-      if (idx === 0 && activePage === 0 && !tag) {
+      if (isAddress) {
+        el.className = 'address';
+        el.style.fontStyle = 'italic';
+      } else if (isLetter) {
+        el.className = 'letter' + (extra ? ' ' + extra : '');
+        el.style.fontStyle = 'italic';
+      } else if (idx === 0 && activePage === 0) {
         el.classList.add('epigraph');
       }
       pageSheet.appendChild(el);
